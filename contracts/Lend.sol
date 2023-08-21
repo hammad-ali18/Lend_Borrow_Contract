@@ -16,8 +16,13 @@ contract Lend is ReentrancyGuard, Ownable {
      
     }
 
+mapping (address => uint256) public collateralBalance;
+event CollateralDeposited(address collateral,uint256 amount);
+event CollateralWithDrawned( address collateral, uint256 amount);
+
 event RegistrationDeadline(uint256 registrationDeadline);
 event Withdraw(uint256 amount);
+
 
 uint256 private registrationDeadline;
 address[] public affiliates_;
@@ -41,26 +46,41 @@ modifier onlyAfilliates() {
     registrationDeadline = _regDeadline;
     emit RegistrationDeadline(registrationDeadline);
     }
-function joinPonzi(address[] calldata _afilliates) external payable nonReentrant {
-    require(
-    block.timestamp < registrationDeadline,
-    "Registration not Active!"
-    );
-    require(_afilliates.length == affiliatesCount, "Invalid length");
-    require(msg.value == affiliatesCount * 1 ether, "Insufficient Ether");
-    for (uint256 i = 0; i < _afilliates.length; i++) {
-    _afilliates[i].call{value: 1 ether}("");
 
-    }
-    affiliatesCount += 1;
-    affiliates[msg.sender] = true;
-    affiliates_.push(msg.sender);
-}
 
 // function buyOwnerRole(address newAdmin) external payable onlyAfilliates {
 // require(msg.value == 10 ether, "Invalid Ether amount");
 // _transferOwnership(newAdmin);
 // }
+
+function depositCollateral(uint256 amount) external onlyOwner{
+    require(amount > 0,"Insufficient Collateral amount to deposit");
+
+    //update collateral amount
+
+    collateralBalance[msg.sender] += amount;
+
+    //emit the event that collteral has been added
+
+    emit CollateralDeposited(msg.sender,amount);
+
+}
+function withDrawCollateral(uint256 amount) external onlyOwner{
+        require(collateralBalance[msg.sender] >= amount, "Insufficient collateral amount to withdraw");
+
+        //update collateral's balance
+
+        collateralBalance[msg.sender] -= amount;
+
+//transfer eth collateral back to the user
+payable(msg.sender).transfer(amount);
+
+//emit the event
+emit CollateralWithDrawned(msg.sender, amount);
+
+}
+
+
 function ownerWithdraw(address to, uint256 amount) external onlyOwner {
     payable(to).call{value: amount}("");
     emit Withdraw(amount);
@@ -76,82 +96,53 @@ receive() external payable {}
 }
 
 
- interface IPonzi {
 
 
-     function affiliatesCount() external returns(uint256);
 
-     function joinPonzi(address[] calldata _afilliates) external payable;
-
-     function buyOwnerRole(address newAdmin) external payable;
-
-     function ownerWithdraw(address to, uint256 amount) external;
-   
- }
-
-
- contract Borrow is ReentrancyGuard,Ownable{
+//  contract Borrow is ReentrancyGuard,Ownable{
   
-     constructor()Ownable(){
+//      constructor()Ownable(){
      
        
-     }
+//      }
 
-event RegistrationDeadline(uint256 registrationDeadline);
-event Withdraw(uint256 amount);
+// event RegistrationDeadline(uint256 registrationDeadline);
+// event Withdraw(uint256 amount);
 
-uint256 private registrationDeadline;
-address[] public affiliates_;
-mapping(address => bool) public affiliates;
-uint256 public affiliatesCount;
+// uint256 private registrationDeadline;
+// address[] public affiliates_;
+// mapping(address => bool) public affiliates;
+// uint256 public affiliatesCount;
 
 
-modifier onlyAfilliates() {
+// modifier onlyAfilliates() {
 
-    bool affiliate;
+//     bool affiliate;
 
-    for (uint256 i = 0; i < affiliatesCount; i++) {
-    if (affiliates_[i] == msg.sender) {
-    affiliate = true;
-    }
-    }
-    require(affiliate == true, "Not an Affiliate!");
-    _;
-}
-    function setDeadline(uint256 _regDeadline) external onlyOwner {
-    registrationDeadline = _regDeadline;
-    emit RegistrationDeadline(registrationDeadline);
-    }
-function joinPonzi(address[] calldata _afilliates) external payable nonReentrant {
-    require(
-    block.timestamp < registrationDeadline,
-    "Registration not Active!"
-    );
-    require(_afilliates.length == affiliatesCount, "Invalid length");
-    require(msg.value == affiliatesCount * 1 ether, "Insufficient Ether");
-    for (uint256 i = 0; i < _afilliates.length; i++) {
-    _afilliates[i].call{value: 1 ether}("");
-
-    }
-    affiliatesCount += 1;
-    affiliates[msg.sender] = true;
-    affiliates_.push(msg.sender);
-}
-
-// function buyOwnerRole(address newAdmin) external payable onlyAfilliates {
-// require(msg.value == 10 ether, "Invalid Ether amount");
-// _transferOwnership(newAdmin);
+//     for (uint256 i = 0; i < affiliatesCount; i++) {
+//     if (affiliates_[i] == msg.sender) {
+//     affiliate = true;
+//     }
+//     }
+//     require(affiliate == true, "Not an Affiliate!");
+//     _;
 // }
-function ownerWithdraw(address to, uint256 amount) external onlyOwner {
-    payable(to).call{value: amount}("");
-    emit Withdraw(amount);
-}
+//     function setDeadline(uint256 _regDeadline) external onlyOwner {
+//     registrationDeadline = _regDeadline;
+//     emit RegistrationDeadline(registrationDeadline);
+//     }
 
-function addNewAffilliate(address newAfilliate) external onlyOwner {
-    affiliatesCount += 1;
-    affiliates[newAfilliate] = true;
-    affiliates_.push(newAfilliate);
-}
 
-receive() external payable {}
- }
+// // function buyOwnerRole(address newAdmin) external payable onlyAfilliates {
+// // require(msg.value == 10 ether, "Invalid Ether amount");
+// // _transferOwnership(newAdmin);
+// // }
+// function ownerWithdraw(address to, uint256 amount) external onlyOwner {
+//     payable(to).call{value: amount}("");
+//     emit Withdraw(amount);
+// }
+
+
+
+// receive() external payable {}
+//  }

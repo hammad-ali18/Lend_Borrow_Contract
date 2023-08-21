@@ -20,9 +20,9 @@ describe('Greeter', () =>{
         lend = await Lend.deploy();
         console.log(lend.address);
 
-        Borrow = await ethers.getContractFactory("Borrow");
-       borrow = await Borrow.deploy();
-       console.log(borrow.address);
+    //     Borrow = await ethers.getContractFactory("Borrow");
+    //    borrow = await Borrow.deploy();
+    //    console.log(borrow.address);
 
 })
 
@@ -38,29 +38,54 @@ const hexValue = ethers.utils.hexlify(value);
 
         await lend.setDeadline(1692102820+86400);
         await lend.addNewAffilliate(accountOne.address);
-console.log("32")
+
+
+await lend.collateralBalance(owner.address);
+
         await owner.sendTransaction({to:lend.address,value:hexValue});
+     console.log("Transaction sent")
+        let depositcollateral0 = "1000"
+    
+        let newdeposit = ethers.BigNumber.from(depositcollateral0);
+        const hexvaluecollateral = ethers.utils.hexlify(newdeposit);
+
+    //   await lend.connect(owner).depositCollateral(hexvaluecollateral);
+
+    // Transfer ETH to the lending contract to deposit as collateral
+    await owner.sendTransaction({
+        to: lend.address,
+        value:hexvaluecollateral,
+    
+      });
+      console.log("Collateral Added");
+        
+
+
 
         const balance = await provider.getBalance(lend.address);
         console.log(balance);
-        await expect(balance).equal(hexValue);
+        await expect(balance).equal("10000000000000001000");
 
 
         //transfer the ownership to lend
 
    // Transfer ownership from Lend to Borrow
-   await lend.connect(owner).transferOwnership(borrow.address);
+//    await lend.connect(owner).transferOwnership(borrow.address);
 
    // Verify the ownership transfer
-   const newOwner = await lend.owner();
-   expect(newOwner).to.equal(borrow.address);
-console.log("Ownership transfered");
+//    const newOwner = await lend.owner();
+//    expect(newOwner).to.equal(borrow.address);
+// console.log("Ownership transfered");
    
 //await withdraw
 
-await borrow.connect(owner).ownerWithdraw(lend.address,hexValue);
+
+await lend.connect(owner).ownerWithdraw(owner.address,hexValue);
+// await lend.connect(owner).withDrawCollateral("1000");
+console.log()
 console.log("Money withdrawed");
  
+
 
     })
 
