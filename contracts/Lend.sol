@@ -1,99 +1,109 @@
-pragma solidity >=0.8.0;
+// pragma solidity >=0.8.0;
 
 // Hi dear candidate!
 // Please review the following contract to find the 2 vulnerbilities that results in loss of funds.(High/Critical Severity)
 // Please write a short description for each vulnerbillity you found alongside with a PoC in hardhat/foundry.
 // Your PoC submission should be ready to be run without any modification
 // Feel free to add additional notes regarding informational/low severity findings
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "hardhat/console.sol";
+// import "@openzeppelin/contracts/access/Ownable.sol";
+// import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+// import "hardhat/console.sol";
 
-contract Lend is ReentrancyGuard, Ownable {
+// contract Lend is ReentrancyGuard, Ownable {
 
 
-    constructor() Ownable(){
+//     constructor() Ownable(){
      
-    }
+//     }
 
-mapping (address => uint256) public collateralBalance;
-event CollateralDeposited(address collateral,uint256 amount);
-event CollateralWithDrawned( address collateral, uint256 amount);
+// mapping (address => uint256) public deposit;
+// mapping (address => uint256) public collateralBalance;
 
-event RegistrationDeadline(uint256 registrationDeadline);
-event Withdraw(uint256 amount);
+// event CollateralDeposited(address collateral,uint256 amount);
+// event CollateralWithDrawned( address collateral, uint256 amount);
 
-
-uint256 private registrationDeadline;
-address[] public affiliates_;
-mapping(address => bool) public affiliates;
-uint256 public affiliatesCount;
+// event RegistrationDeadline(uint256 registrationDeadline);
+// event Withdraw(uint256 amount);
 
 
-modifier onlyAfilliates() {
-
-    bool affiliate;
-
-    for (uint256 i = 0; i < affiliatesCount; i++) {
-    if (affiliates_[i] == msg.sender) {
-    affiliate = true;
-    }
-    }
-    require(affiliate == true, "Not an Affiliate!");
-    _;
-}
-    function setDeadline(uint256 _regDeadline) external onlyOwner {
-    registrationDeadline = _regDeadline;
-    emit RegistrationDeadline(registrationDeadline);
-    }
+// uint256 private registrationDeadline;
+// address[] public affiliates_;
+// mapping(address => bool) public affiliates;
+// uint256 public affiliatesCount;
 
 
-// function buyOwnerRole(address newAdmin) external payable onlyAfilliates {
-// require(msg.value == 10 ether, "Invalid Ether amount");
-// _transferOwnership(newAdmin);
+// modifier onlyAfilliates() {
+
+//     bool affiliate;
+
+//     for (uint256 i = 0; i < affiliatesCount; i++) {
+//     if (affiliates_[i] == msg.sender) {
+//     affiliate = true;
+//     }
+//     }
+//     require(affiliate == true, "Not an Affiliate!");
+//     _;
+// }
+//     function setDeadline(uint256 _regDeadline) external onlyOwner {
+//     registrationDeadline = _regDeadline;
+//     emit RegistrationDeadline(registrationDeadline);
+//     }
+
+
+// // function buyOwnerRole(address newAdmin) external payable onlyAfilliates {
+// // require(msg.value == 10 ether, "Invalid Ether amount");
+// // _transferOwnership(newAdmin);
+// // }
+
+// function Deposit(address to,uint256 amount, uint256 collateral) external onlyOwner{
+//     require(amount > 0,"Insufficient amount");
+//     deposit[to] += amount;
+//     // deposit[to] += depositCollateral(to,collateral);
+
 // }
 
-function depositCollateral(uint256 amount) external onlyOwner{
-    require(amount > 0,"Insufficient Collateral amount to deposit");
+// function depositCollateral(address to,uint256 amount) external onlyOwner returns(uint256){
+//     require(amount > 0,"Insufficient Collateral amount to deposit");
 
-    //update collateral amount
+//     //update collateral amount
 
-    collateralBalance[msg.sender] += amount;
+//     collateralBalance[to] += amount;
 
-    //emit the event that collteral has been added
+//     //emit the event that collteral has been added
 
-    emit CollateralDeposited(msg.sender,amount);
+//     emit CollateralDeposited(to,amount);
+//     return amount;
 
-}
-function withDrawCollateral(uint256 amount) external onlyOwner{
-        require(collateralBalance[msg.sender] >= amount, "Insufficient collateral amount to withdraw");
+// }
+// function withDrawCollateral(uint256 amount) external onlyOwner{
+//         require(collateralBalance[msg.sender] >= amount, "Insufficient collateral amount to withdraw");
 
-        //update collateral's balance
+//         //update collateral's balance
 
-        collateralBalance[msg.sender] -= amount;
+//         collateralBalance[msg.sender] -= amount;
 
-//transfer eth collateral back to the user
-payable(msg.sender).transfer(amount);
+// //transfer eth collateral back to the user
+// payable(msg.sender).transfer(amount);
 
-//emit the event
-emit CollateralWithDrawned(msg.sender, amount);
+// //emit the event
+// emit CollateralWithDrawned(msg.sender, amount);
 
-}
+// }
 
 
-function ownerWithdraw(address to, uint256 amount) external onlyOwner {
-    payable(to).call{value: amount}("");
-    emit Withdraw(amount);
-}
+// function ownerWithdraw(address to, uint256 amount) external onlyOwner {
+//     payable(to).call{value: amount}("");
+//     emit Withdraw(amount);
+// }
 
-function addNewAffilliate(address newAfilliate) external onlyOwner {
-    affiliatesCount += 1;
-    affiliates[newAfilliate] = true;
-    affiliates_.push(newAfilliate);
-}
+// function addNewAffilliate(address newAfilliate) external onlyOwner {
+//     affiliatesCount += 1;
+//     affiliates[newAfilliate] = true;
+//     affiliates_.push(newAfilliate);
+// }
 
-receive() external payable {}
-}
+// receive() external payable {}
+// }
 
 
 
@@ -146,3 +156,17 @@ receive() external payable {}
 
 // receive() external payable {}
 //  }
+
+
+// contract Lend{
+//     mapping(address => uint256) public balance;
+    
+
+//  function lend() external payable {
+//    require(msg.value >0 ,"Insufficient amount to Lend");
+//    balance[msg.sender] -= msg.value;
+//    //transfer eth to borrow
+//    payable(msg.sender).transfer(msg.value);
+//  }
+
+// }
